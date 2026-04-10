@@ -1,0 +1,311 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.wrap{display:flex;justify-content:center;padding:1.5rem 0;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);}
+.phone{width:320px;background:var(--color-background-primary);border-radius:36px;border:1.5px solid var(--color-border-secondary);overflow:hidden;display:flex;flex-direction:column;}
+.status-bar{background:#1a1a1a;padding:12px 20px 8px;display:flex;justify-content:space-between;}
+.status-bar span{color:#fff;font-size:11px;font-weight:500;}
+.app-header{background:#1a1a1a;padding:8px 20px 14px;text-align:center;}
+.app-title{color:#fff;font-size:17px;font-weight:500;}
+.app-sub{color:#aaa;font-size:11px;margin-top:2px;}
+.zone{padding:12px 16px;}
+.zone-label{font-size:10px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:0.8px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.zone-num{width:16px;height:16px;border-radius:50%;background:var(--color-background-info);color:var(--color-text-info);font-size:9px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.divider{height:0.5px;background:var(--color-border-tertiary);margin:0 16px;}
+.bread-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.bread-scroll::-webkit-scrollbar{display:none;}
+.bread-btn{flex-shrink:0;width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px 6px;border-radius:var(--border-radius-lg);border:1.5px solid transparent;transition:all 0.15s;}
+.bread-btn.active{border-color:#D85A30;background:#FAECE7;}
+.bread-icon{width:44px;height:44px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;font-size:22px;}
+.bread-btn.active .bread-icon{background:#F5C4B3;}
+.bread-name{font-size:10px;color:var(--color-text-secondary);text-align:center;line-height:1.3;}
+.bread-btn.active .bread-name{color:#993C1D;font-weight:500;}
+.scroll-hint{font-size:10px;color:var(--color-text-tertiary);text-align:right;margin-top:4px;}
+.ing-list{display:flex;flex-direction:column;gap:8px;}
+.ing-row{display:flex;align-items:center;gap:8px;}
+.ing-label{font-size:13px;color:var(--color-text-secondary);width:70px;flex-shrink:0;}
+.ing-input-wrap{flex:1;position:relative;}
+.ing-input{width:100%;height:34px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);padding:0 28px 0 10px;font-size:13px;color:var(--color-text-primary);}
+.ing-input.active-field{border-color:#D85A30;background:#FAECE7;color:#712B13;}
+.ing-input.computed{background:#E1F5EE;border-color:#5DCAA5;color:#085041;}
+.ing-unit{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--color-text-tertiary);pointer-events:none;}
+.pct-btn{width:54px;height:34px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);font-size:12px;color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:1px;flex-shrink:0;transition:all 0.12s;}
+.pct-btn:hover{border-color:#888780;}
+.pct-btn.fixed{background:transparent;border-color:transparent;color:var(--color-text-tertiary);cursor:default;}
+.pct-modal-bg{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.35);z-index:10;align-items:flex-end;justify-content:center;}
+.pct-modal-bg.open{display:flex;}
+.pct-modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;padding:16px;width:100%;}
+.pct-modal-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;}
+.pct-modal-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pct-modal-label{font-size:13px;color:var(--color-text-secondary);width:70px;}
+.pct-modal-input-wrap{flex:1;position:relative;}
+.pct-modal-input{width:100%;height:36px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);padding:0 24px 0 10px;font-size:14px;color:var(--color-text-primary);}
+.pct-modal-input:focus{outline:none;border-color:#D85A30;}
+.pct-modal-sym{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--color-text-tertiary);}
+.pct-modal-btn{width:100%;padding:11px;background:#D85A30;border:none;border-radius:var(--border-radius-md);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;}
+.recipe-select-wrap{margin-bottom:10px;}
+.recipe-select{width:100%;height:34px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);padding:0 10px;font-size:13px;color:var(--color-text-primary);}
+.result-total{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-top:4px;}
+.result-total-label{font-size:12px;color:var(--color-text-secondary);}
+.result-total-val{font-size:16px;font-weight:500;color:var(--color-text-primary);}
+.calc-btn{width:100%;padding:13px;background:#D85A30;border:none;border-radius:var(--border-radius-lg);color:#fff;font-size:15px;font-weight:500;cursor:pointer;}
+.calc-btn:active{opacity:0.85;}
+.reset-btn{width:100%;padding:8px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-secondary);font-size:12px;cursor:pointer;margin-top:6px;}
+</style>
+
+<div class="wrap">
+  <div class="phone" style="position:relative;overflow:hidden;">
+    <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+    <div class="app-header">
+      <div class="app-title">르방 계산기</div>
+      <div class="app-sub">Levain Calculator</div>
+    </div>
+
+    <div class="zone">
+      <div class="zone-label"><span class="zone-num">1</span>빵 종류 선택</div>
+      <div class="bread-scroll">
+        <div class="bread-btn active" onclick="selectBread(0)"><div class="bread-icon">🍞</div><div class="bread-name">사워도우</div></div>
+        <div class="bread-btn" onclick="selectBread(1)"><div class="bread-icon">🥖</div><div class="bread-name">바게트</div></div>
+        <div class="bread-btn" onclick="selectBread(2)"><div class="bread-icon">🫓</div><div class="bread-name">치아바타</div></div>
+        <div class="bread-btn" onclick="selectBread(3)"><div class="bread-icon">🍕</div><div class="bread-name">포카치아</div></div>
+        <div class="bread-btn" onclick="selectBread(4)"><div class="bread-icon">🍮</div><div class="bread-name">크림브륄레</div></div>
+      </div>
+      <div class="scroll-hint">← 좌우로 슬라이드</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="zone" style="padding-bottom:4px;">
+      <div class="zone-label"><span class="zone-num">2</span>재료 입력 <span style="font-size:9px;color:var(--color-text-tertiary);margin-left:4px;">하나만 입력하면 나머지 자동 계산</span></div>
+      <div class="recipe-select-wrap">
+        <select class="recipe-select" id="recipeSelect" onchange="onRecipeSelect()"></select>
+      </div>
+      <div class="ing-list">
+        <div class="ing-row">
+          <div class="ing-label" style="font-size:10px;color:var(--color-text-tertiary);"></div>
+          <div style="flex:1;font-size:10px;color:var(--color-text-tertiary);padding-left:10px;">입력 (g)</div>
+          <div style="width:54px;font-size:10px;color:var(--color-text-tertiary);text-align:center;">비율(레시피)</div>
+        </div>
+        <div class="ing-row">
+          <div class="ing-label">밀가루</div>
+          <div class="ing-input-wrap">
+            <input class="ing-input" id="f-flour" type="number" min="0" placeholder="—" oninput="onInput('flour')" />
+            <span class="ing-unit">g</span>
+          </div>
+          <div class="pct-btn fixed">100%</div>
+        </div>
+        <div class="ing-row">
+          <div class="ing-label">물</div>
+          <div class="ing-input-wrap">
+            <input class="ing-input" id="f-water" type="number" min="0" placeholder="—" oninput="onInput('water')" />
+            <span class="ing-unit">g</span>
+          </div>
+          <button class="pct-btn" id="pb-water" onclick="openModal('water')"><span id="pv-water">—</span>%</button>
+        </div>
+        <div class="ing-row">
+          <div class="ing-label">르방 종</div>
+          <div class="ing-input-wrap">
+            <input class="ing-input" id="f-levain" type="number" min="0" placeholder="—" oninput="onInput('levain')" />
+            <span class="ing-unit">g</span>
+          </div>
+          <button class="pct-btn" id="pb-levain" onclick="openModal('levain')"><span id="pv-levain">—</span>%</button>
+        </div>
+        <div class="ing-row">
+          <div class="ing-label">소금</div>
+          <div class="ing-input-wrap">
+            <input class="ing-input" id="f-salt" type="number" min="0" placeholder="—" oninput="onInput('salt')" />
+            <span class="ing-unit">g</span>
+          </div>
+          <button class="pct-btn" id="pb-salt" onclick="openModal('salt')"><span id="pv-salt">—</span>%</button>
+        </div>
+        <div class="result-total">
+          <span class="result-total-label">총 반죽 무게</span>
+          <span class="result-total-val" id="res-total">— g</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin-top:12px;"></div>
+
+    <div class="zone" style="padding-bottom:20px;">
+      <div class="zone-label"><span class="zone-num">3</span>계산</div>
+      <button class="calc-btn" onclick="calculate()">계산하기</button>
+      <button class="reset-btn" onclick="resetAll()">초기화</button>
+    </div>
+
+    <div class="pct-modal-bg" id="pctModalBg" onclick="closeModalBg(event)">
+      <div class="pct-modal">
+        <div class="pct-modal-title" id="modalTitle">비율(레시피) 조정</div>
+        <div class="pct-modal-row">
+          <div class="pct-modal-label" id="modalLabel"></div>
+          <div class="pct-modal-input-wrap">
+            <input class="pct-modal-input" id="modalInput" type="number" step="0.1" min="0" />
+            <span class="pct-modal-sym">%</span>
+          </div>
+        </div>
+        <button class="pct-modal-btn" onclick="applyModal()">적용</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const breadRecipes = [
+  { name:'사워도우', recipes:[
+    { label:"Mark's Recipe", water:61.4, levain:27.3, salt:1.8 },
+    { label:'직접 비율 조정', water:75, levain:20, salt:2 },
+  ]},
+  { name:'바게트', recipes:[
+    { label:'기본 레시피', water:68, levain:15, salt:2 },
+    { label:'직접 비율 조정', water:68, levain:15, salt:2 },
+  ]},
+  { name:'치아바타', recipes:[
+    { label:'기본 레시피', water:80, levain:20, salt:2 },
+    { label:'직접 비율 조정', water:80, levain:20, salt:2 },
+  ]},
+  { name:'포카치아', recipes:[
+    { label:'기본 레시피', water:85, levain:18, salt:2.2 },
+    { label:'직접 비율 조정', water:85, levain:18, salt:2.2 },
+  ]},
+  { name:'크림브륄레', recipes:[
+    { label:'기본 레시피', water:60, levain:15, salt:1 },
+    { label:'직접 비율 조정', water:60, levain:15, salt:1 },
+  ]},
+];
+
+const keys = ['flour','water','levain','salt'];
+let activeKey = null;
+let currentBreadIdx = 0;
+let modalKey = null;
+let customPcts = { water:61.4, levain:27.3, salt:1.8 };
+
+function buildRecipeSelect(breadIdx) {
+  const sel = document.getElementById('recipeSelect');
+  sel.innerHTML = '';
+  breadRecipes[breadIdx].recipes.forEach((r,i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = r.label;
+    sel.appendChild(opt);
+  });
+  applyRecipe(breadIdx, 0);
+  setCustomMode(false);
+}
+
+function onRecipeSelect() {
+  const sel = document.getElementById('recipeSelect');
+  const idx = parseInt(sel.value);
+  const isCustom = idx === breadRecipes[currentBreadIdx].recipes.length - 1;
+  applyRecipe(currentBreadIdx, idx);
+  setCustomMode(isCustom);
+}
+
+function setCustomMode(isCustom) {
+  ['water','levain','salt'].forEach(k => {
+    const btn = document.getElementById('pb-'+k);
+    if (isCustom) {
+      btn.style.borderColor = '';
+      btn.style.background = '';
+      btn.style.cursor = 'pointer';
+      btn.onclick = () => openModal(k);
+    } else {
+      btn.style.borderColor = 'transparent';
+      btn.style.background = 'transparent';
+      btn.style.cursor = 'default';
+      btn.onclick = null;
+    }
+  });
+}
+
+function applyRecipe(breadIdx, recipeIdx) {
+  const r = breadRecipes[breadIdx].recipes[recipeIdx];
+  customPcts = { water:r.water, levain:r.levain, salt:r.salt };
+  updatePctBtns();
+  if (activeKey) calculate();
+}
+
+function updatePctBtns() {
+  document.getElementById('pv-water').textContent = customPcts.water;
+  document.getElementById('pv-levain').textContent = customPcts.levain;
+  document.getElementById('pv-salt').textContent = customPcts.salt;
+}
+
+function selectBread(idx) {
+  currentBreadIdx = idx;
+  document.querySelectorAll('.bread-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  buildRecipeSelect(idx);
+  resetAll();
+}
+
+function getPcts() {
+  return { flour:100, ...customPcts };
+}
+
+function onInput(key) {
+  activeKey = key;
+  keys.forEach(k => {
+    const el = document.getElementById('f-'+k);
+    el.classList.toggle('active-field', k===key);
+    if (k!==key) el.classList.add('computed');
+    else el.classList.remove('computed');
+  });
+}
+
+function calculate() {
+  if (!activeKey) { activeKey='flour'; onInput('flour'); }
+  const val = parseFloat(document.getElementById('f-'+activeKey).value);
+  if (!val || val<=0) { document.getElementById('res-total').textContent='— g'; return; }
+  const p = getPcts();
+  const flourG = (val / p[activeKey]) * 100;
+  keys.forEach(k => {
+    if (k===activeKey) return;
+    const computed = Math.round((flourG * p[k] / 100) * 10) / 10;
+    const el = document.getElementById('f-'+k);
+    el.value = computed;
+    el.classList.add('computed');
+    el.classList.remove('active-field');
+  });
+  const total = Math.round(flourG * (100+p.water+p.levain+p.salt) / 100 * 10) / 10;
+  document.getElementById('res-total').textContent = total + ' g';
+}
+
+function resetAll() {
+  activeKey = null;
+  keys.forEach(k => {
+    const el = document.getElementById('f-'+k);
+    el.value = '';
+    el.classList.remove('active-field','computed');
+  });
+  document.getElementById('res-total').textContent = '— g';
+}
+
+function openModal(key) {
+  modalKey = key;
+  const labels = { water:'물', levain:'르방 종', salt:'소금' };
+  document.getElementById('modalLabel').textContent = labels[key];
+  document.getElementById('modalInput').value = customPcts[key];
+  document.getElementById('pctModalBg').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 50);
+}
+
+function closeModalBg(e) {
+  if (e.target===document.getElementById('pctModalBg')) closeModal();
+}
+
+function closeModal() {
+  document.getElementById('pctModalBg').classList.remove('open');
+  modalKey = null;
+}
+
+function applyModal() {
+  const val = parseFloat(document.getElementById('modalInput').value);
+  if (!isNaN(val) && val>=0) {
+    customPcts[modalKey] = Math.round(val*10)/10;
+    updatePctBtns();
+    if (activeKey) calculate();
+  }
+  closeModal();
+}
+
+buildRecipeSelect(0);
+</script>
