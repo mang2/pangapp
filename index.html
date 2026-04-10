@@ -79,7 +79,7 @@ body{display:flex;justify-content:center;align-items:center;}
         <div class="bread-btn" onclick="selectBread(1)"><div class="bread-icon">🥖</div><div class="bread-name">바게트</div></div>
         <div class="bread-btn" onclick="selectBread(2)"><div class="bread-icon">🫓</div><div class="bread-name">치아바타</div></div>
         <div class="bread-btn" onclick="selectBread(3)"><div class="bread-icon">🍕</div><div class="bread-name">포카치아</div></div>
-        <div class="bread-btn" onclick="selectBread(4)"><div class="bread-icon">🍮</div><div class="bread-name">크림브륄레</div></div>
+        <div class="bread-btn" onclick="selectBread(4)"><div class="bread-icon">🍮</div><div class="bread-name">크림브륄뤨뤨레</div></div>
       </div>
       <div class="scroll-hint">← 좌우로 슬라이드</div>
     </div>
@@ -100,7 +100,7 @@ body{display:flex;justify-content:center;align-items:center;}
         <div class="ing-row">
           <div class="ing-label">밀가루</div>
           <div class="ing-input-wrap">
-            <input class="ing-input" id="f-flour" type="number" min="0" placeholder="—" oninput="onInput('flour')" />
+            <input class="ing-input" id="f-flour" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('flour')" />
             <span class="ing-unit">g</span>
           </div>
           <div class="pct-btn fixed">100%</div>
@@ -108,15 +108,15 @@ body{display:flex;justify-content:center;align-items:center;}
         <div class="ing-row">
           <div class="ing-label">물</div>
           <div class="ing-input-wrap">
-            <input class="ing-input" id="f-water" type="number" min="0" placeholder="—" oninput="onInput('water')" />
+            <input class="ing-input" id="f-water" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('water')" />
             <span class="ing-unit">g</span>
           </div>
           <button class="pct-btn" id="pb-water" onclick="openModal('water')"><span id="pv-water">—</span>%</button>
         </div>
         <div class="ing-row">
-          <div class="ing-label">르방 종</div>
+          <div class="ing-label">르방</div>
           <div class="ing-input-wrap">
-            <input class="ing-input" id="f-levain" type="number" min="0" placeholder="—" oninput="onInput('levain')" />
+            <input class="ing-input" id="f-levain" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('levain')" />
             <span class="ing-unit">g</span>
           </div>
           <button class="pct-btn" id="pb-levain" onclick="openModal('levain')"><span id="pv-levain">—</span>%</button>
@@ -124,7 +124,7 @@ body{display:flex;justify-content:center;align-items:center;}
         <div class="ing-row">
           <div class="ing-label">소금</div>
           <div class="ing-input-wrap">
-            <input class="ing-input" id="f-salt" type="number" min="0" placeholder="—" oninput="onInput('salt')" />
+            <input class="ing-input" id="f-salt" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('salt')" />
             <span class="ing-unit">g</span>
           </div>
           <button class="pct-btn" id="pb-salt" onclick="openModal('salt')"><span id="pv-salt">—</span>%</button>
@@ -150,7 +150,7 @@ body{display:flex;justify-content:center;align-items:center;}
         <div class="pct-modal-row">
           <div class="pct-modal-label" id="modalLabel"></div>
           <div class="pct-modal-input-wrap">
-            <input class="pct-modal-input" id="modalInput" type="number" step="0.1" min="0" />
+            <input class="pct-modal-input" id="modalInput" type="number" inputmode="decimal" step="0.1" min="0" />
             <span class="pct-modal-sym">%</span>
           </div>
         </div>
@@ -253,12 +253,17 @@ function getPcts() {
 }
 
 function onInput(key) {
+  const el = document.getElementById('f-'+key);
+  let val = el.value;
+  if (val && isNaN(val)) {
+    el.value = val.replace(/[^0-9.]/g, '');
+  }
   activeKey = key;
   keys.forEach(k => {
-    const el = document.getElementById('f-'+k);
-    el.classList.toggle('active-field', k===key);
-    if (k!==key) el.classList.add('computed');
-    else el.classList.remove('computed');
+    const e = document.getElementById('f-'+k);
+    e.classList.toggle('active-field', k===key);
+    if (k!==key) e.classList.add('computed');
+    else e.classList.remove('computed');
   });
 }
 
