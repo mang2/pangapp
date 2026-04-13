@@ -292,13 +292,13 @@ function calculate() {
   }
   keys.forEach(k => {
     if (k===activeKey) return;
-    const computed = Math.round((flourG * p[k] / 100) * 10) / 10;
+    const computed = Math.round(flourG * p[k] / 100);
     const el = document.getElementById('f-'+k);
     el.value = computed;
     el.classList.add('computed');
     el.classList.remove('active-field');
   });
-  const total = Math.round(flourG * (100 + p.water + p.levain + p.salt) / 100 * 10) / 10;
+  const total = Math.round(flourG * (100 + p.water + p.levain + p.salt) / 100);
   document.getElementById('res-total').textContent = total + ' g';
 }
 
