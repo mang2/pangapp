@@ -173,7 +173,7 @@ const breadRecipes = [
   { name:'사워도우', recipes:[
     { label:'신선 레시피', water:61.4, levain:27.3, salt:1.8, wholewheat:30 },
     { label:"Mark's Recipe", water:70, levain:25, salt:2 },
-    { label:'직접 비율 조정', water:75, levain:20, salt:2 },
+    { label:'직접 비율 조정', water:75, levain:20, salt:2, wholewheat:0 },
   ]},
   { name:'바게트', recipes:[
     { label:'기본 레시피', water:68, levain:15, salt:2 },
@@ -235,6 +235,9 @@ function setCustomMode(isCustom) {
       btn.onclick = null;
     }
   });
+  if (isCustom) {
+    document.getElementById('wholewheat-row').style.display = 'flex';
+  }
 }
 
 function applyRecipe(breadIdx, recipeIdx) {
