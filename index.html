@@ -98,12 +98,20 @@ body{display:flex;justify-content:center;align-items:center;}
           <div style="width:54px;font-size:10px;color:var(--color-text-tertiary);text-align:center;">비율(레시피)</div>
         </div>
         <div class="ing-row">
-          <div class="ing-label">밀가루</div>
+          <div class="ing-label">일반 밀가루</div>
           <div class="ing-input-wrap">
-            <input class="ing-input" id="f-flour" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('flour')" />
+            <input class="ing-input" id="f-whiteflour" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('whiteflour')" />
             <span class="ing-unit">g</span>
           </div>
-          <div class="pct-btn fixed">100%</div>
+          <div class="pct-btn fixed" id="pb-whiteflour"><span id="pv-whiteflour">70</span>%</div>
+        </div>
+        <div class="ing-row" id="wholewheat-row" style="display:none;">
+          <div class="ing-label">통밀</div>
+          <div class="ing-input-wrap">
+            <input class="ing-input" id="f-wholewheat" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('wholewheat')" />
+            <span class="ing-unit">g</span>
+          </div>
+          <button class="pct-btn" id="pb-wholewheat" onclick="openModal('wholewheat')"><span id="pv-wholewheat">30</span>%</button>
         </div>
         <div class="ing-row">
           <div class="ing-label">물</div>
@@ -163,7 +171,8 @@ body{display:flex;justify-content:center;align-items:center;}
 <script>
 const breadRecipes = [
   { name:'사워도우', recipes:[
-    { label:"Mark's Recipe", water:61.4, levain:27.3, salt:1.8 },
+    { label:"Mark's Recipe", water:61.4, levain:27.3, salt:1.8, wholewheat:30 },
+    { label:'신선 레시피', water:70, levain:25, salt:2 },
     { label:'직접 비율 조정', water:75, levain:20, salt:2 },
   ]},
   { name:'바게트', recipes:[
@@ -184,11 +193,11 @@ const breadRecipes = [
   ]},
 ];
 
-const keys = ['flour','water','levain','salt'];
+const keys = ['whiteflour','wholewheat','water','levain','salt'];
 let activeKey = null;
 let currentBreadIdx = 0;
 let modalKey = null;
-let customPcts = { water:61.4, levain:27.3, salt:1.8 };
+let customPcts = { water:61.4, levain:27.3, salt:1.8, wholewheat:30 };
 
 function buildRecipeSelect(breadIdx) {
   const sel = document.getElementById('recipeSelect');
@@ -212,7 +221,7 @@ function onRecipeSelect() {
 }
 
 function setCustomMode(isCustom) {
-  ['water','levain','salt'].forEach(k => {
+  ['water','levain','salt','wholewheat'].forEach(k => {
     const btn = document.getElementById('pb-'+k);
     if (isCustom) {
       btn.style.borderColor = '';
@@ -230,12 +239,15 @@ function setCustomMode(isCustom) {
 
 function applyRecipe(breadIdx, recipeIdx) {
   const r = breadRecipes[breadIdx].recipes[recipeIdx];
-  customPcts = { water:r.water, levain:r.levain, salt:r.salt };
+  customPcts = { water:r.water, levain:r.levain, salt:r.salt, wholewheat:r.wholewheat || 0 };
   updatePctBtns();
+  document.getElementById('wholewheat-row').style.display = customPcts.wholewheat > 0 ? 'flex' : 'none';
   if (activeKey) calculate();
 }
 
 function updatePctBtns() {
+  document.getElementById('pv-whiteflour').textContent = 100 - (customPcts.wholewheat || 0);
+  document.getElementById('pv-wholewheat').textContent = customPcts.wholewheat;
   document.getElementById('pv-water').textContent = customPcts.water;
   document.getElementById('pv-levain').textContent = customPcts.levain;
   document.getElementById('pv-salt').textContent = customPcts.salt;
@@ -249,7 +261,7 @@ function selectBread(idx) {
 }
 
 function getPcts() {
-  return { flour:100, ...customPcts };
+  return { whiteflour:100 - (customPcts.wholewheat || 0), wholewheat: customPcts.wholewheat || 0, water:customPcts.water, levain:customPcts.levain, salt:customPcts.salt };
 }
 
 function onInput(key) {
@@ -268,11 +280,16 @@ function onInput(key) {
 }
 
 function calculate() {
-  if (!activeKey) { activeKey='flour'; onInput('flour'); }
+  if (!activeKey) { activeKey='whiteflour'; onInput('whiteflour'); }
   const val = parseFloat(document.getElementById('f-'+activeKey).value);
   if (!val || val<=0) { document.getElementById('res-total').textContent='— g'; return; }
   const p = getPcts();
-  const flourG = (val / p[activeKey]) * 100;
+  let flourG;
+  if (activeKey === 'whiteflour' || activeKey === 'wholewheat') {
+    flourG = val / (p[activeKey] / 100);
+  } else {
+    flourG = (val / p[activeKey]) * 100;
+  }
   keys.forEach(k => {
     if (k===activeKey) return;
     const computed = Math.round((flourG * p[k] / 100) * 10) / 10;
@@ -281,7 +298,7 @@ function calculate() {
     el.classList.add('computed');
     el.classList.remove('active-field');
   });
-  const total = Math.round(flourG * (100+p.water+p.levain+p.salt) / 100 * 10) / 10;
+  const total = Math.round(flourG * (100 + p.water + p.levain + p.salt) / 100 * 10) / 10;
   document.getElementById('res-total').textContent = total + ' g';
 }
 
@@ -297,7 +314,7 @@ function resetAll() {
 
 function openModal(key) {
   modalKey = key;
-  const labels = { water:'물', levain:'르방 종', salt:'소금' };
+  const labels = { water:'물', levain:'르방 종', salt:'소금', wholewheat:'통밀' };
   document.getElementById('modalLabel').textContent = labels[key];
   document.getElementById('modalInput').value = customPcts[key];
   document.getElementById('pctModalBg').classList.add('open');
