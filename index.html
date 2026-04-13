@@ -55,6 +55,10 @@ body{display:flex;justify-content:center;align-items:center;}
 .pct-modal-input:focus{outline:none;border-color:#D85A30;}
 .pct-modal-sym{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--color-text-tertiary);}
 .pct-modal-btn{width:100%;padding:11px;background:#D85A30;border:none;border-radius:var(--border-radius-md);color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;}
+.flour-group{display:flex;flex-direction:column;gap:8px;}
+.flour-group.linked{background:#F7F4EF;border-radius:var(--border-radius-md);padding:8px;border-left:3px solid #C8A882;position:relative;}
+.flour-group-label{display:none;font-size:9px;color:#9B7A52;font-weight:500;letter-spacing:0.5px;margin-bottom:4px;}
+.flour-group.linked .flour-group-label{display:block;}
 .recipe-select-wrap{margin-bottom:10px;}
 .recipe-select{width:100%;height:34px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);padding:0 10px;font-size:13px;color:var(--color-text-primary);}
 .result-total{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-top:4px;}
@@ -68,8 +72,7 @@ body{display:flex;justify-content:center;align-items:center;}
 <div class="wrap">
   <div class="phone" style="position:relative;overflow:hidden;">
     <div class="app-header">
-      <div class="app-title">르방 계산기</div>
-      <div class="app-sub">Levain Calculator</div>
+      <div class="app-title">빵 비율 계산기</div>
     </div>
 
     <div class="zone">
@@ -97,21 +100,24 @@ body{display:flex;justify-content:center;align-items:center;}
           <div style="flex:1;font-size:10px;color:var(--color-text-tertiary);padding-left:10px;">입력 (g)</div>
           <div style="width:54px;font-size:10px;color:var(--color-text-tertiary);text-align:center;">비율(레시피)</div>
         </div>
-        <div class="ing-row">
-          <div class="ing-label">일반 밀가루</div>
-          <div class="ing-input-wrap">
-            <input class="ing-input" id="f-whiteflour" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('whiteflour')" />
-            <span class="ing-unit">g</span>
+        <div class="flour-group" id="flour-group">
+          <div class="flour-group-label">밀가루 합계 100%</div>
+          <div class="ing-row">
+            <div class="ing-label">일반 밀가루</div>
+            <div class="ing-input-wrap">
+              <input class="ing-input" id="f-whiteflour" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('whiteflour')" />
+              <span class="ing-unit">g</span>
+            </div>
+            <div class="pct-btn fixed" id="pb-whiteflour"><span id="pv-whiteflour">70</span>%</div>
           </div>
-          <div class="pct-btn fixed" id="pb-whiteflour"><span id="pv-whiteflour">70</span>%</div>
-        </div>
-        <div class="ing-row" id="wholewheat-row" style="display:none;">
-          <div class="ing-label">통밀</div>
-          <div class="ing-input-wrap">
-            <input class="ing-input" id="f-wholewheat" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('wholewheat')" />
-            <span class="ing-unit">g</span>
+          <div class="ing-row" id="wholewheat-row" style="display:none;">
+            <div class="ing-label">통밀</div>
+            <div class="ing-input-wrap">
+              <input class="ing-input" id="f-wholewheat" type="number" inputmode="decimal" min="0" placeholder="—" oninput="onInput('wholewheat')" />
+              <span class="ing-unit">g</span>
+            </div>
+            <button class="pct-btn" id="pb-wholewheat" onclick="openModal('wholewheat')"><span id="pv-wholewheat">30</span>%</button>
           </div>
-          <button class="pct-btn" id="pb-wholewheat" onclick="openModal('wholewheat')"><span id="pv-wholewheat">30</span>%</button>
         </div>
         <div class="ing-row">
           <div class="ing-label">물</div>
@@ -235,16 +241,15 @@ function setCustomMode(isCustom) {
       btn.onclick = null;
     }
   });
-  if (isCustom) {
-    document.getElementById('wholewheat-row').style.display = 'flex';
-  }
+  const showWheat = isCustom || customPcts.wholewheat > 0;
+  document.getElementById('wholewheat-row').style.display = showWheat ? 'flex' : 'none';
+  document.getElementById('flour-group').classList.toggle('linked', showWheat);
 }
 
 function applyRecipe(breadIdx, recipeIdx) {
   const r = breadRecipes[breadIdx].recipes[recipeIdx];
   customPcts = { water:r.water, levain:r.levain, salt:r.salt, wholewheat:r.wholewheat || 0 };
   updatePctBtns();
-  document.getElementById('wholewheat-row').style.display = customPcts.wholewheat > 0 ? 'flex' : 'none';
   if (activeKey) calculate();
 }
 
